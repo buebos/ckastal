@@ -1,0 +1,1 @@
+- Maybe add a config global option for the logger

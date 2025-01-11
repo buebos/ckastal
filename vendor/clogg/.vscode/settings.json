@@ -1,0 +1,10 @@
+{
+  "C_Cpp.clang_format_fallbackStyle": "{ BasedOnStyle: Google, IndentWidth: 4, ColumnLimit: 0}",
+  "files.associations": {
+    "clogg.h": "c",
+    "stdarg.h": "c",
+    "stdio.h": "c",
+    "color.h": "c"
+  },
+  "cmake.configureOnOpen": false
+}

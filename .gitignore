@@ -1,0 +1,4 @@
+# Ignore any executables that can be generated from the project.
+build
+*.out
+*.exe

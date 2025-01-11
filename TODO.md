@@ -1,0 +1,2 @@
+- A lot, refactor and optimize all this code lol.
+- Consider defining a custom header file to provide definition of standard features, eliminating the need for dependencies on stdlib.h and stdbool.h static linking on the executables using this lib.

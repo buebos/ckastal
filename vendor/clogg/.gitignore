@@ -1,0 +1,6 @@
+# Ignoring the compiled libraries
+lib
+build
+
+# Ignore the test binaries
+test/bin

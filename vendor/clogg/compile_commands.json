@@ -1,0 +1,7 @@
+[
+  {
+    "directory": ".",
+    "command": "gcc -shared -o lib/clogg.a src/clogg.c",
+    "file": "./src/heap/imp/heapter.c"
+  }
+]

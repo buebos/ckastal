@@ -1,0 +1,3 @@
+[submodule "vendor/clogg"]
+path = vendor/clogg
+url = https://github.com/buebos/clogg
