@@ -5,8 +5,8 @@
 #include "../../../include/linked_list.c"
 #include "../../../include/syntax_utils.h"
 #include "../../../include/terminal_utils.c"
-#include "view/EnemyList.c"
 #include "model/Enemy.c"
+#include "view/EnemyList.c"
 
 Ck_DataType enemy_data_type = {
     .size = sizeof(Enemy),
@@ -49,40 +49,26 @@ int main(int argc, char** argv) {
 
         printf("[INFO]: Sorted");
 
-        switch (sort_strategy) {
-            case 1:
-                printf(" asc by health:\n");
-
-                ck_list_bubblesort(sorted_enemies, Enemy*, {
+        ck_list_bubblesort(sorted_enemies, Enemy*, {
+            switch (sort_strategy) {
+                case 1:
+                    printf(" asc by health:\n");
                     order = a->health - b->health;
-                });
-
-                break;
-            case 2:
-                printf(" desc by health:\n");
-
-                ck_list_bubblesort(sorted_enemies, Enemy*, {
+                    break;
+                case 2:
+                    printf(" desc by health:\n");
                     order = b->health - a->health;
-                });
-
-                break;
-            case 3:
-                printf(" asc by tag:\n");
-
-                ck_list_bubblesort(sorted_enemies, Enemy*, {
+                    break;
+                case 3:
+                    printf(" asc by tag:\n");
                     order = enemy_type_tags[a->type][0] - enemy_type_tags[b->type][0];
-                });
-
-                break;
-            default:
-                printf(" desc by tag:\n");
-
-                ck_list_bubblesort(sorted_enemies, Enemy*, {
+                    break;
+                default:
+                    printf(" desc by tag:\n");
                     order = enemy_type_tags[b->type][0] - enemy_type_tags[a->type][0];
-                });
-
-                break;
-        }
+                    break;
+            }
+        });
 
         EnemyList(&sorted_enemies);
         printf("\n");
