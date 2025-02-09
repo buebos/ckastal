@@ -1,89 +1,93 @@
 #include "../../../../../lib/provider/string/length_prefixed/index.c"
 
 #include <assert.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include "../../../../../vendor/clogg/src/clogg.c"
 
 int main(void) {
-    Ck_LenStr a = ck_lenstr_init(ck_lenstr_slp("hello"));
-    Ck_LenStr b = ck_lenstr_init(ck_lenstr_slp("hello"));
+    Ck_LenStr hello = ck_lenstr_init(ck_lenstr_slp("hello"));
+    Ck_LenStr hello__2 = ck_lenstr_init(malloc(5 * sizeof(char)), 5, 0);
 
-    assert(ck_lenstr_cmp(&a, &b) == 0);
-    assert(ck_lenstr_eq(&a, &b));
+    ck_lenstr_pushs(&hello__2, "hello", 5);
 
-    ck_lenstr_set(&b, ck_lenstr_slp("world"));
+    assert(ck_lenstr_cmp(&hello, &hello) == 0);
+    assert(ck_lenstr_eq(&hello, &hello));
+    assert(ck_lenstr_cmp(&hello, &hello__2) == 0);
+    assert(ck_lenstr_eq(&hello, &hello__2));
+    assert(ck_lenstr_cmp(&hello__2, &hello) == 0);
+    assert(ck_lenstr_eq(&hello__2, &hello));
 
-    assert(ck_lenstr_cmp(&a, &b) == strcmp("hello", "world"));
-    assert(!ck_lenstr_eq(&a, &b));
+    Ck_LenStr world = ck_lenstr_init(ck_lenstr_slp("world"));
 
-    ck_lenstr_set(&b, ck_lenstr_slp("hello world"));
-    assert(ck_lenstr_cmp(&a, &b) == strcmp("hello", "hello world"));
-    assert(!ck_lenstr_eq(&a, &b));
+    assert(ck_lenstr_cmp(&hello, &world) == strcmp("hello", "world"));
+    assert(!ck_lenstr_eq(&hello, &world));
 
-    ck_lenstr_set(&b, ck_lenstr_slp(""));
-    assert(ck_lenstr_cmp(&a, &b) == strcmp("hello", ""));
-    assert(!ck_lenstr_eq(&a, &b));
+    Ck_LenStr hello_world = ck_lenstr_init(ck_lenstr_slp("hello world"));
+    assert(ck_lenstr_cmp(&hello, &hello_world) == strcmp("hello", "hello world"));
+    assert(!ck_lenstr_eq(&hello, &hello_world));
 
-    ck_lenstr_set(&b, NULL, 0);
-    assert(ck_lenstr_cmp(&a, &b) == strcmp("hello", ""));
-    assert(!ck_lenstr_eq(&a, &b));
+    Ck_LenStr empty = ck_lenstr_init(ck_lenstr_slp(""));
+    assert(ck_lenstr_cmp(&hello, &empty) == strcmp("hello", ""));
+    assert(!ck_lenstr_eq(&hello, &empty));
 
-    ck_lenstr_set(&a, NULL, 0);
-    ck_lenstr_set(&b, NULL, 0);
-    assert(ck_lenstr_cmp(&a, &b) == strcmp("", ""));
-    assert(ck_lenstr_eq(&a, &b));
+    Ck_LenStr null = ck_lenstr_init(NULL, 0, 0);
+    assert(ck_lenstr_cmp(&hello, &null) == strcmp("hello", ""));
+    assert(!ck_lenstr_eq(&hello, &null));
 
-    ck_lenstr_set(&a, NULL, 0);
-    ck_lenstr_set(&b, ck_lenstr_slp("hello"));
-    assert(ck_lenstr_cmp(&a, &b) == -1);
-    assert(!ck_lenstr_eq(&a, &b));
+    Ck_LenStr null2 = ck_lenstr_init(NULL, 0, 0);
+    assert(ck_lenstr_cmp(&null, &null2) == strcmp("", ""));
+    assert(ck_lenstr_eq(&null, &null2));
 
-    ck_lenstr_set(&a, ck_lenstr_slp("h"));
-    ck_lenstr_set(&b, ck_lenstr_slp("h"));
-    assert(ck_lenstr_cmp(&a, &b) == 0);
-    assert(ck_lenstr_eq(&a, &b));
+    assert(ck_lenstr_cmp(&null, &hello__2) == -1);
+    assert(!ck_lenstr_eq(&null, &hello__2));
 
-    ck_lenstr_set(&a, ck_lenstr_slp("aaaaaaaaaaaaaaaa"));
-    ck_lenstr_set(&b, ck_lenstr_slp("aaaaaaaaaaaaaaaa"));
-    assert(ck_lenstr_cmp(&a, &b) == 0);
-    assert(ck_lenstr_eq(&a, &b));
+    /**
+     * Null string should not be the same as empty string.
+     */
+    assert(ck_lenstr_cmp(&null, &empty) != strcmp("", ""));
 
-    ck_lenstr_set(&b, ck_lenstr_slp("aaaaaaaaaaaaaaaab"));
-    assert(ck_lenstr_cmp(&a, &b) == -1);
-    assert(!ck_lenstr_eq(&a, &b));
+    Ck_LenStr empty__2 = ck_lenstr_init(ck_lenstr_slp(""));
+    assert(ck_lenstr_cmp(&empty, &empty__2) == strcmp("", ""));
 
-    ck_lenstr_set(&a, NULL, 0);
-    ck_lenstr_set(&b, "", 0);
-    assert(ck_lenstr_cmp(&a, &b) != strcmp("", ""));
+    Ck_LenStr h = ck_lenstr_init(ck_lenstr_slp("h"));
+    Ck_LenStr h__2 = ck_lenstr_init(ck_lenstr_slp("h"));
+    assert(ck_lenstr_cmp(&h, &h__2) == 0);
+    assert(ck_lenstr_eq(&h, &h__2));
 
-    ck_lenstr_set(&a, "", 0);
-    ck_lenstr_set(&b, "", 0);
-    assert(ck_lenstr_cmp(&a, &b) == strcmp("", ""));
+    Ck_LenStr a_times_16 = ck_lenstr_init(ck_lenstr_slp("aaaaaaaaaaaaaaaa"));
+    Ck_LenStr a_times_16__2 = ck_lenstr_init(ck_lenstr_slp("aaaaaaaaaaaaaaaa"));
+    assert(ck_lenstr_cmp(&a_times_16, &a_times_16__2) == 0);
+    assert(ck_lenstr_eq(&a_times_16, &a_times_16__2));
 
-    ck_lenstr_set(&a, ck_lenstr_slp("hello"));
-    ck_lenstr_set(&b, ck_lenstr_slp("h"));
-    Ck_LenStr slice = ck_lenstr_slice(&a, 0, 1);
-    assert(ck_lenstr_eq(&slice, &b));
+    Ck_LenStr a_times_16_b_end = ck_lenstr_init(ck_lenstr_slp("aaaaaaaaaaaaaaaab"));
+    assert(ck_lenstr_cmp(&a_times_16, &a_times_16_b_end) == -1);
+    assert(!ck_lenstr_eq(&a_times_16, &a_times_16_b_end));
 
-    ck_lenstr_set(&a, ck_lenstr_slp("hello world"));
-    ck_lenstr_set(&b, ck_lenstr_slp("hello"));
-    slice = ck_lenstr_slice(&a, 0, 5);
-    assert(ck_lenstr_cmp(&slice, &b) == 0);
-    assert(ck_lenstr_eq(&slice, &b));
+    Ck_LenStr hello__sliced = ck_lenstr_sliced(&hello, 0, 1);
+    assert(ck_lenstr_eq(&hello__sliced, &h));
 
-    ck_lenstr_set(&a, ck_lenstr_slp("hello world"));
-    ck_lenstr_set(&b, ck_lenstr_slp("hello universe"));
-    slice = ck_lenstr_slice(&a, 0, 5);
-    assert(ck_lenstr_cmp(&slice, &b) != 0);
-    assert(!ck_lenstr_eq(&slice, &b));
+    Ck_LenStr hello_world__sliced = ck_lenstr_sliced(&hello_world, 0, 5);
+    assert(ck_lenstr_cmp(&hello_world__sliced, &hello) == 0);
+    assert(ck_lenstr_eq(&hello_world__sliced, &hello));
+
+    Ck_LenStr hello_universe = ck_lenstr_init(ck_lenstr_slp("hello universe"));
+    assert(ck_lenstr_cmp(&hello_world__sliced, &hello_universe) != 0);
+    assert(!ck_lenstr_eq(&hello_world__sliced, &hello_universe));
 
     char buffer[64] = {0};
 
-    snprintf(buffer, 64, "%.*s", a._len, a._str);
+    Ck_LenStr empty__buffer = ck_lenstr_init(buffer, 64, 0);
+    assert(ck_lenstr_cmp(&empty, &empty__buffer) != 0);
+    assert(!ck_lenstr_eq(&empty, &empty__buffer));
+    assert(ck_lenstr_cmp(&empty__2, &empty__buffer) != 0);
+    assert(!ck_lenstr_eq(&empty__2, &empty__buffer));
 
-    for (size_t i = 0; i < a._len; i++) {
-        assert(buffer[i] == a._str[i]);
+    snprintf(buffer, 64, "%.*s", hello_world._length, hello_world._str);
+
+    for (size_t i = 0; i < hello_world._length; i++) {
+        assert(buffer[i] == hello_world._str[i]);
     }
 
     cloggln(CLOGG_INFO, "All tests passed");

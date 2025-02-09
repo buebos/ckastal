@@ -5,6 +5,8 @@
     "assert.h": "c",
     "clogg.h": "c",
     "stdio.h": "c",
-    "_stdio.h": "c"
+    "_stdio.h": "c",
+    "string.h": "c",
+    "sstream": "c"
   },
 }

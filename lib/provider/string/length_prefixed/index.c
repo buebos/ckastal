@@ -18,25 +18,58 @@ ck_lenstr_init("This a long literal string example", 34)
  * while coding (or select them with the cursor to count them). It's just
  * a minor syntactic sugar lol.
  */
-#define ck_lenstr_slp(str) str, sizeof(str) - 1
+#define ck_lenstr_slp(str) str, sizeof(str), sizeof(str) - 1
 
 typedef struct Ck_LenStr {
-    size_t _len;
+    size_t _length;
+    size_t _capacity;
     char* _str;
 } Ck_LenStr;
 
-Ck_LenStr ck_lenstr_init(char* data, size_t length) {
+Ck_LenStr ck_lenstr_init(char* data, size_t capacity, size_t length) {
     Ck_LenStr str = {
-        ._len = length,
+        ._capacity = capacity,
+        ._length = length,
         ._str = data,
     };
 
     return str;
 }
 
-void ck_lenstr_set(Ck_LenStr* str, char* data, size_t length) {
-    str->_len = length;
-    str->_str = data;
+size_t ck_lenstr_space(Ck_LenStr* self) {
+    return self->_capacity - self->_length;
+}
+
+void ck_lenstr_pushc(Ck_LenStr* self, char c) {
+    self->_str[self->_length] = c;
+    self->_length += 1;
+}
+
+void ck_lenstr_pushs(Ck_LenStr* self, char* str, size_t str_length) {
+    for (size_t i = 0; i < str_length; i++) {
+        ck_lenstr_pushc(self, str[i]);
+    }
+}
+
+void ck_lenstr_copy(Ck_LenStr* self, char* str, size_t str_length) {
+    for (size_t i = 0; i < str_length; i++) {
+        self->_str[i] = str[i];
+    }
+
+    self->_length = str_length;
+}
+
+/**
+ * Does not copy the string, just makes a struct with the start set to
+ * the source original pointer + the start parameter and length with
+ * the difference of start and end.
+ */
+Ck_LenStr ck_lenstr_sliced(Ck_LenStr* source, size_t start, size_t end) {
+    if (start >= end) {
+        return ck_lenstr_init(NULL, 0, 0);
+    }
+
+    return ck_lenstr_init(source->_str + start, end - start, end - start);
 }
 
 /**
@@ -45,11 +78,11 @@ void ck_lenstr_set(Ck_LenStr* str, char* data, size_t length) {
  *
  * @ref strcmp
  */
-char ck_lenstr_cmp(Ck_LenStr* a, Ck_LenStr* b) {
-    if (a->_len < b->_len) {
+int ck_lenstr_cmp(Ck_LenStr* a, Ck_LenStr* b) {
+    if (a->_length < b->_length) {
         return -1;
     }
-    if (b->_len < a->_len) {
+    if (b->_length < a->_length) {
         return 1;
     }
     if (a == b || a->_str == b->_str) {
@@ -64,7 +97,7 @@ char ck_lenstr_cmp(Ck_LenStr* a, Ck_LenStr* b) {
 
     size_t i = 0;
 
-    while (a->_str[i] == b->_str[i] && i < a->_len - 1) {
+    while (a->_str[i] == b->_str[i] && i < a->_length - 1) {
         i += 1;
     }
 
@@ -85,28 +118,7 @@ char ck_lenstr_cmp(Ck_LenStr* a, Ck_LenStr* b) {
  * @ref ck_lenstr_cmp
  */
 bool ck_lenstr_eq(Ck_LenStr* a, Ck_LenStr* b) {
-    return a->_len == b->_len && (a == b || a->_len == b->_len && a->_str == b->_str || ck_lenstr_cmp(a, b) == 0);
-}
-
-/**
- * Does not copy the string, just makes a struct with the start set to
- * the source original pointer + the start parameter and length with
- * the difference of start and end.
- */
-Ck_LenStr ck_lenstr_slice(Ck_LenStr* source, size_t start, size_t end) {
-    if (start >= end) {
-        return ck_lenstr_init(NULL, 0);
-    }
-
-    return ck_lenstr_init(source->_str + start, end - start);
-}
-
-void ck_lenstr_copy(Ck_LenStr* source, Ck_LenStr* destination) {
-    for (size_t i = 0; i < source->_len; i++) {
-        destination->_str[i] = source->_str[i];
-    }
-
-    destination->_len = source->_len;
+    return a->_length == b->_length && (((a == b || a->_length == b->_length) && a->_str == b->_str) || ck_lenstr_cmp(a, b) == 0);
 }
 
 #endif /* __CKASTAL_STRING_LENGTH_PREFIXED_C__ */
