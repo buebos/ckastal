@@ -3,7 +3,7 @@
 
 #include "init.c"
 
-#define ck_foreach(type, node, iterator) \
+#define _ck_foreach(type, node, iterator) \
     for (type node = iterator.next(&iterator); node != NULL; node = iterator.next(&iterator))
 
 typedef struct Ck_Iterator Ck_Iterator;
