@@ -2,9 +2,9 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-#include "../../../include/linked_list.c"
-#include "../../../include/syntax_utils.h"
-#include "../../../include/terminal_utils.c"
+#include "../../include/linked_list.c"
+#include "../../include/syntax_utils.h"
+#include "../../include/terminal_utils.c"
 #include "model/Enemy.c"
 #include "view/EnemyList.c"
 

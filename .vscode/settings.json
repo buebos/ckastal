@@ -7,6 +7,8 @@
     "stdio.h": "c",
     "_stdio.h": "c",
     "string.h": "c",
-    "sstream": "c"
+    "sstream": "c",
+    "ios": "c",
+    "limits": "c"
   },
 }
