@@ -1,1 +1,1 @@
-#include "../src/data_structure/sort/selection.c"
+#include "../src/algorithm/sort/selection.c"
