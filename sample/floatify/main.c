@@ -1,7 +1,7 @@
 #include <regex.h>
 #include <stdio.h>
 
-#include "../../lib/provider/input/index.c"
+#include "../../include/input.c"
 
 int main(void) {
     char buffer[128] = {0};
