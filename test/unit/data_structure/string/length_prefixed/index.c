@@ -83,7 +83,7 @@ int main(void) {
     assert(ck_lenstr_cmp(&empty__2, &empty__buffer) != 0);
     assert(!ck_lenstr_eq(&empty__2, &empty__buffer));
 
-    snprintf(buffer, 64, "%.*s", hello_world._length, hello_world._str);
+    snprintf(buffer, 64, "%.*s", (int)hello_world._length, hello_world._str);
 
     for (size_t i = 0; i < hello_world._length; i++) {
         assert(buffer[i] == hello_world._str[i]);

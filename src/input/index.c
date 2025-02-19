@@ -6,7 +6,7 @@
 #include <unistd.h>
 
 /** */
-#include "../../core/init.c"
+#include "../core/init.c"
 #include "../validation/index.c"
 
 typedef struct Ck_InputParams {

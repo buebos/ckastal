@@ -1,1 +1,1 @@
-#include "../src/provider/tree/binary/index.c"
+#include "../src/data_structure/tree/binary/index.c"

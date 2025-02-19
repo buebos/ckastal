@@ -1,5 +1,6 @@
 #ifndef __CKASTAL_PROVIDER_LIST_SINGLE_FUNCTION_ITERATOR_C__
 #define __CKASTAL_PROVIDER_LIST_SINGLE_FUNCTION_ITERATOR_C__
+
 #include "../../../../core/iterator.c"
 
 #include "../core/main.c"

@@ -1,1 +1,1 @@
-#include "../src/provider/string/length_prefixed/index.c"
+#include "../src/data_structure/string/length_prefixed/index.c"

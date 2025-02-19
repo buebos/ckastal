@@ -3,7 +3,7 @@
 
 #include <regex.h>
 
-#include "../../core/init.c"
+#include "../core/init.c"
 
 typedef enum Ck_ValidationStatus {
     CK_INPUT_OK = 0,

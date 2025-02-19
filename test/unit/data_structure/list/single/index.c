@@ -5,11 +5,6 @@
 #include "../../../../../include/linked_list.c"
 #include "../../../../../vendor/clogg/src/clogg.c"
 
-Ck_Memory ck_memory = {
-    .alloc = malloc,
-    .free = free,
-};
-
 int main(void) {
     Ck_List list = ck_list_init(NULL, CK_LIST_LINEAR);
 
