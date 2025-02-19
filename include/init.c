@@ -1,1 +1,1 @@
-#include "../lib/core/init.c"
+#include "../src/core/init.c"
