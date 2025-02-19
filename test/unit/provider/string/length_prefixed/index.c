@@ -1,9 +1,8 @@
-#include "../../../../../lib/provider/string/length_prefixed/index.c"
-
 #include <assert.h>
 #include <stdlib.h>
 #include <string.h>
 
+#include "../../../../../include/prefixed_length_string.c"
 #include "../../../../../vendor/clogg/src/clogg.c"
 
 int main(void) {
