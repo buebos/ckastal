@@ -1,9 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+#include "../../include/binary_tree.c"
 #include "../../include/syntax_utils.h"
-#include "../../lib/provider/queue/simple/index.c"
-#include "../../lib/provider/tree/binary/index.c"
 
 Ck_DataTypeCompareResult compare(void *a, void *b) {
     int l = deref(a, int);
