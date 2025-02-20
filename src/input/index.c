@@ -2,12 +2,12 @@
 #define __CKASTAL_INPUT_C__
 
 #include <stdio.h>
-#include <termios.h>
-#include <unistd.h>
-
 /** */
 #include "../core/init.c"
+#include "../core/os.c"
 #include "../validation/index.c"
+
+#define CKASTAL_INPUT_STDIN_BACKSPACE 127
 
 typedef struct Ck_InputParams {
     char* prompt;
@@ -18,9 +18,16 @@ typedef struct Ck_InputParams {
     void (*on_after_prompt)();
 } Ck_InputParams;
 
+char _ck_getch(void);
+
+#if defined(CKASTAL_CORE_OS_MACOS) || defined(CKASTAL_CORE_OS_LINUX)
+#include <termios.h>
+#include <unistd.h>
+
 char _ck_getch(void) {
     char buf = 0;
     struct termios old = {0};
+
     fflush(stdout);
 
     if (tcgetattr(0, &old) < 0) {
@@ -49,6 +56,13 @@ char _ck_getch(void) {
 
     return buf;
 }
+#elif CKASTAL_CORE_OS_WINDOWS
+#include <conio.h>
+
+char _ck_getch(void) {
+    return getch();
+}
+#endif
 
 void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
     if (NULL != params.prompt) {
@@ -56,33 +70,43 @@ void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
     }
 
     size_t cursor = 0;
-    char c = 0;
+    char c = _ck_getch();
 
     while (c != '\n') {
-        if (c == '\b') {
+        if (c == CKASTAL_INPUT_STDIN_BACKSPACE) {
             if (cursor > 0) {
-                buffer[cursor - 1] = 0;
-                cursor--;
+                buffer[--cursor] = 0;
+                /** Deletes the char from stdin */
+                printf("\b \b");
             }
 
             c = _ck_getch();
             continue;
         }
-        if (cursor == buffer_size - 2) {
+        /**
+         * Substract one to save space for the null terminator. This will
+         * continue reading until the cursor is decreased via input of
+         * backspace or the new line char is read and the input is submitted.
+         */
+        if (cursor == buffer_size - 1) {
             c = _ck_getch();
             continue;
         }
 
         buffer[cursor] = c;
 
-        Ck_ValidationRes res = params.validator(buffer);
+        if (params.validator) {
+            Ck_ValidationRes res = params.validator(buffer);
 
-        if (res.status == CK_INPUT_ERROR) {
-            buffer[cursor] = 0;
-        } else {
-            printf("%c", c);
-            cursor++;
+            if (res.status == CK_VALIDATION_ERROR) {
+                buffer[cursor] = 0;
+                c = _ck_getch();
+                continue;
+            }
         }
+
+        printf("%c", c);
+        cursor++;
 
         c = _ck_getch();
     }

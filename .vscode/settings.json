@@ -9,6 +9,7 @@
     "string.h": "c",
     "sstream": "c",
     "ios": "c",
-    "limits": "c"
+    "limits": "c",
+    "unistd.h": "c"
   },
 }
