@@ -8,6 +8,7 @@
 #include "../validation/index.c"
 
 #define CKASTAL_INPUT_STDIN_BACKSPACE 127
+#define CKASTAL_INPUT_STDIN_ENTER 13
 
 typedef struct Ck_InputParams {
     char* prompt;
@@ -56,7 +57,7 @@ char _ck_getch(void) {
 
     return buf;
 }
-#elif CKASTAL_CORE_OS_WINDOWS
+#elif defined(CKASTAL_CORE_OS_WINDOWS)
 #include <conio.h>
 
 char _ck_getch(void) {
@@ -72,7 +73,7 @@ void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
     size_t cursor = 0;
     char c = _ck_getch();
 
-    while (c != '\n') {
+    while (c != '\n' && c != CKASTAL_INPUT_STDIN_ENTER) {
         if (c == CKASTAL_INPUT_STDIN_BACKSPACE) {
             if (cursor > 0) {
                 buffer[--cursor] = 0;

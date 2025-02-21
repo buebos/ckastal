@@ -1,7 +1,13 @@
 #ifndef __CKASTAL_VALIDATOR_C__
 #define __CKASTAL_VALIDATOR_C__
 
+#include "../core/os.c"
+
+#ifdef CKASTAL_CORE_OS_WINDOWS
+#include "../../include/gnu_win_regex.c"
+#else
 #include <regex.h>
+#endif
 
 #include "../core/init.c"
 

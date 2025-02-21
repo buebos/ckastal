@@ -16,8 +16,9 @@
 /**
  * size_t definition
  */
-#ifndef _SIZE_T
+#if !defined(_SIZE_T) && !defined(_SIZE_T_DEFINED)
 #define _SIZE_T
+#define _SIZE_T_DEFINED
 typedef unsigned int size_t;
 #endif
 
