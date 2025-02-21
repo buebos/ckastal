@@ -1,8 +1,8 @@
 #ifndef __ENEMY_LIST_C__
 #define __ENEMY_LIST_C__
 
-#include "../../../../include/linked_list.c"
-#include "../../../../include/syntax_utils.h"
+#include "../../../include/linked_list.c"
+#include "../../../include/syntax_utils.h"
 #include "../model/Enemy.c"
 
 void EnemyList(Ck_List* list) {

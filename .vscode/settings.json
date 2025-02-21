@@ -12,6 +12,7 @@
     "limits": "c",
     "unistd.h": "c",
     "regstr.h": "c",
-    "regbag.h": "c"
+    "regbag.h": "c",
+    "regex.h": "c"
   },
 }

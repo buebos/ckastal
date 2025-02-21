@@ -1,4 +1,3 @@
-#include <regex.h>
 #include <stdio.h>
 
 #include "../../include/input.c"

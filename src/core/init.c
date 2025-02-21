@@ -40,7 +40,7 @@ typedef struct Ck_Memory {
     Ck_FreeOperation free;
 } Ck_Memory;
 
-#ifdef _STDLIB_H_
+#if defined(_STDLIB_H_) || defined(_INC_STDLIB)
 #include <stdlib.h>
 
 void *ck_calloc(size_t size) {

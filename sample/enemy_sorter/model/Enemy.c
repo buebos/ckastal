@@ -1,7 +1,7 @@
 #ifndef __ENEMY_C__
 #define __ENEMY_C__
 
-#include "../../../../include/syntax_utils.h"
+#include "../../../include/syntax_utils.h"
 
 typedef struct {
     int x;

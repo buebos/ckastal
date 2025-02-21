@@ -55,7 +55,7 @@ int main(void) {
             fill(arrays[s], lengths[s], strategies[f]);
 
             clock_t start = clock();
-            ck_selection_sort(arrays[s], lengths[s]);
+            ck_int_selection_sort(arrays[s], lengths[s]);
             clock_t end = clock();
 
             double time_taken = ((double)(end - start)) / CLOCKS_PER_SEC * 1000;

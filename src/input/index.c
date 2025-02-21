@@ -7,7 +7,11 @@
 #include "../core/os.c"
 #include "../validation/index.c"
 
+#ifdef CKASTAL_CORE_OS_WINDOWS
+#define CKASTAL_INPUT_STDIN_BACKSPACE 8
+#elif defined(CKASTAL_CORE_OS_IS_UNIX_BASED)
 #define CKASTAL_INPUT_STDIN_BACKSPACE 127
+#endif
 #define CKASTAL_INPUT_STDIN_ENTER 13
 
 typedef struct Ck_InputParams {
