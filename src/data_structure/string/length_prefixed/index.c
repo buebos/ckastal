@@ -18,7 +18,7 @@ ck_lenstr_init("This a long literal string example", 34)
  * while coding (or select them with the cursor to count them). It's just
  * a minor syntactic sugar lol.
  */
-#define ck_lenstr_slp(str) str, sizeof(str), sizeof(str) - 1
+#define ck_lenstr_slp(str) str, sizeof(str) - 1, sizeof(str) - 1
 
 typedef struct Ck_LenStr {
     size_t _length;
