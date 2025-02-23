@@ -74,10 +74,16 @@ void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
         printf("%s", params.prompt);
     }
 
+    Ck_ValidationRes res = {.status = CK_VALIDATION_OK, .message = NULL};
+
     size_t cursor = 0;
     char c = _ck_getch();
 
-    while (c != '\n' && c != CKASTAL_INPUT_STDIN_ENTER) {
+    if (params.validator) {
+        res = params.validator(buffer);
+    }
+
+    while ((c != '\n' && c != CKASTAL_INPUT_STDIN_ENTER) || res.status != CK_VALIDATION_OK) {
         if (c == CKASTAL_INPUT_STDIN_BACKSPACE) {
             if (cursor > 0) {
                 buffer[--cursor] = 0;
@@ -101,7 +107,7 @@ void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
         buffer[cursor] = c;
 
         if (params.validator) {
-            Ck_ValidationRes res = params.validator(buffer);
+            res = params.validator(buffer);
 
             if (res.status == CK_VALIDATION_ERROR) {
                 buffer[cursor] = 0;
@@ -117,6 +123,25 @@ void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
     }
 
     printf("\n");
+}
+
+Ck_ValidationRes _ck_input_yes_or_no_validator(char* input) {
+    Ck_ValidationRes res = {
+        .status = CK_VALIDATION_ERROR,
+        .message = NULL,
+    };
+
+    if (input[0] == 'y' && input[1] == 0 || input[0] == 'n' && input[1] == 0) {
+        res.status = CK_VALIDATION_OK;
+    }
+
+    return res;
+}
+
+bool ck_input_yes_or_no(char* prompt) {
+    char buffer[2] = {0};
+    ck_input(buffer, 2, (Ck_InputParams){.prompt = prompt, .validator = _ck_input_yes_or_no_validator, 0});
+    return buffer[0] == 'y';
 }
 
 #endif /* __CKASTAL_INPUT_C__ */
