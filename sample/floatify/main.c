@@ -1,22 +1,12 @@
 #include <stdio.h>
+#include <stdlib.h>
 
 #include "../../include/input.c"
 
 int main(void) {
-    char buffer[128] = {0};
+    float value = ck_input_float("Type a valid float: ");
 
-    ck_input(
-        buffer,
-        128,
-        (Ck_InputParams){
-            .prompt = "Type a valid float: ",
-            .validator = ck_validation_float,
-            0,
-        }
-
-    );
-
-    printf("%s\n", buffer);
+    printf("The result of parsing that float is: %.20lf\n", value);
 
     return 0;
 }

@@ -2,6 +2,8 @@
 #define __CKASTAL_INPUT_C__
 
 #include <stdio.h>
+#include <stdlib.h>
+
 /** */
 #include "../core/init.c"
 #include "../core/os.c"
@@ -18,6 +20,9 @@ typedef struct Ck_InputParams {
     char* prompt;
 
     Ck_ValidationRes (*validator)(char*);
+
+    bool use_max_length;
+    size_t max_length;
 
     void (*on_before_prompt)();
     void (*on_after_prompt)();
@@ -99,7 +104,11 @@ void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
          * continue reading until the cursor is decreased via input of
          * backspace or the new line char is read and the input is submitted.
          */
-        if (cursor == buffer_size - 1) {
+        if (
+            cursor == buffer_size - 1 ||
+            (params.use_max_length && cursor == params.max_length - 1)
+
+        ) {
             c = _ck_getch();
             continue;
         }
@@ -142,6 +151,27 @@ bool ck_input_yes_or_no(char* prompt) {
     char buffer[2] = {0};
     ck_input(buffer, 2, (Ck_InputParams){.prompt = prompt, .validator = _ck_input_yes_or_no_validator, 0});
     return buffer[0] == 'y';
+}
+
+float ck_input_float(char* prompt) {
+    /**
+     * To get a correct precision in the parsing
+     */
+    const char BUFFER_FLOAT_SIZE = 26;
+    char buffer[BUFFER_FLOAT_SIZE] = {0};
+
+    ck_input(
+        buffer,
+        BUFFER_FLOAT_SIZE,
+        (Ck_InputParams){
+            .prompt = prompt,
+            .validator = ck_validation_float,
+            0,
+        }
+
+    );
+
+    return atof(buffer);
 }
 
 #endif /* __CKASTAL_INPUT_C__ */

@@ -27,23 +27,32 @@ Ck_ValidationRes ck_validation_float(char* value) {
         .status = CK_VALIDATION_OK,
         .message = "Success",
     };
-    regex_t regex;
 
-    result.status = !!regcomp(&regex, "^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?$", REG_EXTENDED);
+    regex_t valid_regex, incomplete_regex;
 
-    if (result.status != CK_VALIDATION_OK) {
-        result.message = "Error";
-        regfree(&regex);
+    const char* valid_pattern = "^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?$";
+    const char* incomplete_pattern = "^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)[eE][+-]?$";
+
+    if (regcomp(&valid_regex, valid_pattern, REG_EXTENDED) ||
+        regcomp(&incomplete_regex, incomplete_pattern, REG_EXTENDED)) {
+        result.status = CK_VALIDATION_ERROR;
+        result.message = "Regex compilation error";
         return result;
     }
 
-    result.status = !!regexec(&regex, value, (size_t)0, NULL, 0);
-
-    if (result.status != CK_VALIDATION_OK) {
-        result.message = "Error";
+    if (regexec(&valid_regex, value, 0, NULL, 0) == 0) {
+        result.status = CK_VALIDATION_OK;
+        result.message = "Success";
+    } else if (regexec(&incomplete_regex, value, 0, NULL, 0) == 0) {
+        result.status = CK_VALIDATION_WARN;
+        result.message = "Warning: Incomplete float";
+    } else {
+        result.status = CK_VALIDATION_ERROR;
+        result.message = "Error: Invalid float";
     }
 
-    regfree(&regex);
+    regfree(&valid_regex);
+    regfree(&incomplete_regex);
 
     return result;
 }
