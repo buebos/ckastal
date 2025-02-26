@@ -15,7 +15,7 @@ typedef enum Ck_DataTypeCompareResult {
 
 typedef Ck_DataTypeCompareResult (*Ck_DataTypeCompare)(void*, void*);
 
-typedef struct {
+typedef struct Ck_DataType {
     size_t size;
     Ck_DataTypeToStr to_str;
     Ck_DataTypeCompare compare;

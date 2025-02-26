@@ -4,7 +4,7 @@
 #include "../core/os.c"
 
 #ifdef CKASTAL_CORE_OS_WINDOWS
-#include "../../include/gnu_win_regex.c"
+#include "../../vendor/gnu-win-regex-2.7-src/src/regex.c"
 #else
 #include <regex.h>
 #endif
