@@ -1,1 +1,1 @@
-#include "../src/algorithm/sort/selection.c"
+#include "../src/dsa/array/index.c"

@@ -5,9 +5,15 @@
 #include <stdlib.h>
 
 /** */
-#include "../core/init.c"
-#include "../core/os.c"
-#include "../validation/index.c"
+#include "../../core/init.c"
+#include "../../core/os.c"
+#include "../../dsa/string/null_terminated/index.c"
+
+#ifdef CKASTAL_CORE_OS_WINDOWS
+#include "../../vendor/gnu-win-regex-2.7-src/src/regex.c"
+#else
+#include <regex.h>
+#endif
 
 #ifdef CKASTAL_CORE_OS_WINDOWS
 #define CKASTAL_INPUT_STDIN_BACKSPACE 8
@@ -15,6 +21,17 @@
 #define CKASTAL_INPUT_STDIN_BACKSPACE 127
 #endif
 #define CKASTAL_INPUT_STDIN_ENTER 13
+
+typedef enum Ck_ValidationStatus {
+    CK_VALIDATION_OK = 0,
+    CK_VALIDATION_ERROR,
+    CK_VALIDATION_WARN,
+} Ck_ValidationStatus;
+
+typedef struct Ck_ValidationRes {
+    Ck_ValidationStatus status;
+    char* message;
+} Ck_ValidationRes;
 
 typedef struct Ck_InputParams {
     char* prompt;
@@ -153,6 +170,41 @@ bool ck_input_yes_or_no(char* prompt) {
     return buffer[0] == 'y';
 }
 
+Ck_ValidationRes _ck_input_float_validator(char* value) {
+    Ck_ValidationRes result = {
+        .status = CK_VALIDATION_OK,
+        .message = "Success",
+    };
+
+    regex_t valid_regex, incomplete_regex;
+
+    const char* valid_pattern = "^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)([eE][+-]?[0-9]+)?$";
+    const char* incomplete_pattern = "^[+-]?([0-9]+([.][0-9]*)?|[.][0-9]+)[eE][+-]?$";
+
+    if (regcomp(&valid_regex, valid_pattern, REG_EXTENDED) ||
+        regcomp(&incomplete_regex, incomplete_pattern, REG_EXTENDED)) {
+        result.status = CK_VALIDATION_ERROR;
+        result.message = "Regex compilation error";
+        return result;
+    }
+
+    if (regexec(&valid_regex, value, 0, NULL, 0) == 0) {
+        result.status = CK_VALIDATION_OK;
+        result.message = "Success";
+    } else if (regexec(&incomplete_regex, value, 0, NULL, 0) == 0) {
+        result.status = CK_VALIDATION_WARN;
+        result.message = "Warning: Incomplete float";
+    } else {
+        result.status = CK_VALIDATION_ERROR;
+        result.message = "Error: Invalid float";
+    }
+
+    regfree(&valid_regex);
+    regfree(&incomplete_regex);
+
+    return result;
+}
+
 float ck_input_float(char* prompt) {
     /**
      * To get a correct precision in the parsing
@@ -165,13 +217,27 @@ float ck_input_float(char* prompt) {
         BUFFER_FLOAT_SIZE,
         (Ck_InputParams){
             .prompt = prompt,
-            .validator = ck_validation_float,
+            .validator = _ck_input_float_validator,
             0,
         }
 
     );
 
     return atof(buffer);
+}
+
+void ck_input_to_continue(char* prompt) {
+    if (NULL != prompt) {
+        printf("%s", prompt);
+    }
+
+    char c = _ck_getch();
+
+    while ((c != '\n' && c != CKASTAL_INPUT_STDIN_ENTER)) {
+        c = _ck_getch();
+    }
+
+    printf("\n");
 }
 
 #endif /* __CKASTAL_INPUT_C__ */

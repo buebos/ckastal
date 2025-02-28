@@ -1,7 +1,7 @@
-#ifndef __CKASTAL_SORT_SELECTION_C__
-#define __CKASTAL_SORT_SELECTION_C__
+#ifndef __CKASTAL_DSA_ARRAY_FUNCTION_SELECTION_SORT_C__
+#define __CKASTAL_DSA_ARRAY_FUNCTION_SELECTION_SORT_C__
 
-#include "../../core/init.c"
+#include "../../../core/init.c"
 
 void ck_int_selection_sort(int arr[], size_t length) {
     for (size_t i = 0; i < length - 1; i++) {
@@ -20,4 +20,4 @@ void ck_int_selection_sort(int arr[], size_t length) {
     }
 }
 
-#endif /* __CKASTAL_SORT_SELECTION_C__ */
+#endif /* __CKASTAL_DSA_ARRAY_FUNCTION_SELECTION_SORT_C__ */

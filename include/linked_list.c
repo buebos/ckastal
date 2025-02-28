@@ -1,1 +1,1 @@
-#include "../src/data_structure/list/single/index.c"
+#include "../src/dsa/list/single/index.c"

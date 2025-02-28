@@ -1,1 +1,1 @@
-#include "../src/input/index.c"
+#include "../src/cli/input/index.c"

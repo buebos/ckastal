@@ -49,7 +49,7 @@ int main(int argc, char** argv) {
 
         printf("[INFO]: Sorted");
 
-        ck_list_bubblesort(sorted_enemies, Enemy*, {
+        CK_LIST_INLINE_BUBBLESORT_FN(sorted_enemies, Enemy*, {
             switch (sort_strategy) {
                 case 1:
                     printf(" asc by health:\n");
