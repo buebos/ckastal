@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <time.h>
 
-#include "../../include/selection_sort.c"
+#include "../../include/array.c"
 
 typedef enum FillStrategy {
     ORDERED = 0,
