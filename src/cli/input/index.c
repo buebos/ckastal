@@ -43,6 +43,8 @@ typedef struct Ck_InputParams {
 
     void (*on_before_prompt)();
     void (*on_after_prompt)();
+
+    bool skip_end_new_line;
 } Ck_InputParams;
 
 char _ck_getch(void);
@@ -148,7 +150,9 @@ void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
         c = _ck_getch();
     }
 
-    printf("\n");
+    if (!params.skip_end_new_line) {
+        printf("\n");
+    }
 }
 
 Ck_ValidationRes _ck_input_yes_or_no_validator(char* input) {
