@@ -47,13 +47,13 @@ typedef struct Ck_InputParams {
     bool skip_end_new_line;
 } Ck_InputParams;
 
-char _ck_getch(void);
+char ck_getch(void);
 
 #if defined(CKASTAL_CORE_OS_MACOS) || defined(CKASTAL_CORE_OS_LINUX)
 #include <termios.h>
 #include <unistd.h>
 
-char _ck_getch(void) {
+char ck_getch(void) {
     char buf = 0;
     struct termios old = {0};
 
@@ -88,7 +88,7 @@ char _ck_getch(void) {
 #elif defined(CKASTAL_CORE_OS_WINDOWS)
 #include <conio.h>
 
-char _ck_getch(void) {
+char ck_getch(void) {
     return getch();
 }
 #endif
@@ -101,7 +101,7 @@ void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
     Ck_ValidationRes res = {.status = CK_VALIDATION_OK, .message = NULL};
 
     size_t cursor = 0;
-    char c = _ck_getch();
+    char c = ck_getch();
 
     if (params.validator) {
         res = params.validator(buffer);
@@ -115,7 +115,7 @@ void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
                 printf("\b \b");
             }
 
-            c = _ck_getch();
+            c = ck_getch();
             continue;
         }
         /**
@@ -128,7 +128,7 @@ void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
             (params.use_max_length && cursor == params.max_length - 1)
 
         ) {
-            c = _ck_getch();
+            c = ck_getch();
             continue;
         }
 
@@ -139,7 +139,7 @@ void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
 
             if (res.status == CK_VALIDATION_ERROR) {
                 buffer[cursor] = 0;
-                c = _ck_getch();
+                c = ck_getch();
                 continue;
             }
         }
@@ -147,7 +147,7 @@ void ck_input(char* buffer, size_t buffer_size, Ck_InputParams params) {
         printf("%c", c);
         cursor++;
 
-        c = _ck_getch();
+        c = ck_getch();
     }
 
     if (!params.skip_end_new_line) {
@@ -235,10 +235,10 @@ void ck_input_to_continue(char* prompt) {
         printf("%s", prompt);
     }
 
-    char c = _ck_getch();
+    char c = ck_getch();
 
     while ((c != '\n' && c != CKASTAL_INPUT_STDIN_ENTER)) {
-        c = _ck_getch();
+        c = ck_getch();
     }
 
     printf("\n");
