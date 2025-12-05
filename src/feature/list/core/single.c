@@ -1,8 +1,8 @@
 #ifndef __CKASTAL_LIST_SINGLE_CORE_C__
 #define __CKASTAL_LIST_SINGLE_CORE_C__
 
-#include "../../../../core/data.c"
-#include "../../../../core/init.c"
+#include "../../../core/data.c"
+#include "../../../core/init.c"
 
 typedef enum Ck_ListMode {
     CK_LIST_LINEAR = 0,

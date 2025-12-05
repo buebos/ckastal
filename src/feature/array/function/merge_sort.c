@@ -66,7 +66,7 @@ void _ck_int_merge_sort_recursive(int arr[], int l, int r) {
  * @param n The number of elements in the array.
  */
 void ck_int_merge_sort(int arr[], size_t n) {
-    mergeSort(arr, 0, n - 1);
+    _ck_int_merge_sort_recursive(arr, 0, n - 1);
 }
 
 #endif /* __CKASTAL_DSA_ARRAY_FUNCTION_MERGE_SORT_C__ */

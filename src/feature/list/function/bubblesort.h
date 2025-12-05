@@ -1,7 +1,7 @@
 #ifndef __CKASTAL_PROVIDER_LIST_SINGLE_FUNCTION_BUBBLESORT_H__
 #define __CKASTAL_PROVIDER_LIST_SINGLE_FUNCTION_BUBBLESORT_H__
 
-#include "../core/main.c"
+#include "../core/single.c"
 
 #define CK_LIST_INLINE_BUBBLESORT_FN(list, type, block) \
     {                                                   \

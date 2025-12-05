@@ -2,8 +2,8 @@
 #include <assert.h>
 #include <stdlib.h>
 
-#include "../../../../../include/linked_list.c"
-#include "../../../../../vendor/clogg/src/clogg.c"
+#include "../../../include/linked_list.c"
+#include "../../../vendor/clogg/src/clogg.c"
 
 int main(void) {
     Ck_List list = ck_list_init(NULL, CK_LIST_LINEAR);

@@ -2,8 +2,8 @@
 #include <stdlib.h>
 #include <string.h>
 
-#include "../../../../../include/prefixed_length_string.c"
-#include "../../../../../vendor/clogg/src/clogg.c"
+#include "../../../include/prefixed_length_string.c"
+#include "../../../vendor/clogg/src/clogg.c"
 
 int main(void) {
     Ck_LenStr hello = ck_lenstr_init(ck_lenstr_slp("hello"));

@@ -1,1 +1,1 @@
-#include "../src/dsa/array/index.c"
+#include "../src/feature/array/index.c"

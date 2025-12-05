@@ -1,9 +1,9 @@
 #ifndef __CKASTAL_PROVIDER_LIST_SINGLE_FUNCTION_ITERATOR_C__
 #define __CKASTAL_PROVIDER_LIST_SINGLE_FUNCTION_ITERATOR_C__
 
-#include "../../../../core/iterator.c"
+#include "../../../core/iterator.c"
 
-#include "../core/main.c"
+#include "../core/single.c"
 
 void* _ck_list_iterator_next(Ck_Iterator* self) {
     Ck_List* list = self->_collection;

@@ -1,7 +1,7 @@
 #ifndef __CKASTAL_QUEUE_C__
 #define __CKASTAL_QUEUE_C__
 
-#include "../../list/single/index.c"
+#include "../../list/index.c"
 
 #include "../../../core/data.c"
 
