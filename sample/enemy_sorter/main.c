@@ -15,7 +15,7 @@ Ck_DataType enemy_data_type = {
 };
 
 int main(int argc, char** argv) {
-    Ck_List enemies = ck_list_init(&enemy_data_type, CK_LIST_LINEAR);
+    Ck_List enemies = ck_list_init(&enemy_data_type, CK_LIST_MODE_LINEAR);
     bool should_continue = true;
 
     for (int i = 1; i <= 20; i++) {

@@ -108,9 +108,7 @@ static int _mkdir_recursive(const char* path) {
 static int _compile_test(const char* src_path, const char* bin_path, RunnerConfig* cfg) {
     char command[MAX_COMMAND];
 
-    if (cfg->mode != MODE_SILENT) {
-        printf(COLOR_MAGENTA "[BUILD]" COLOR_RESET " Compiling %s\n", src_path);
-    }
+    printf(COLOR_MAGENTA "[BUILD]" COLOR_RESET " Compiling %s\n", src_path);
 
     snprintf(command, sizeof(command), "cc -Wall %s %s %s -o %s",
              cfg->cflags, cfg->cppflags, src_path, bin_path);
@@ -154,7 +152,7 @@ static int _execute_test(const char* bin_path, const char* src_path, RunnerConfi
     char line[512];
     while (fgets(line, sizeof(line), fp)) {
         strcat(output, line);
-        if (cfg->mode != MODE_SILENT) {
+        if (cfg->mode != MODE_SILENT || strstr(line, "tests, ") != NULL) {
             printf("  %s", line);
         }
     }

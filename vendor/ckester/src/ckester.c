@@ -154,17 +154,13 @@ static int _ckastal_run_all_tests(void) {
 
     if (test_failures == 0) {
         printf("[INFO]:  All tests passed\n");
-        if (_test_results.verbose) {
-            printf("         %d tests, %d assertions\n", _test_registry.count, _test_results.passed);
-        }
+        printf("         %d tests, %d assertions\n", _test_registry.count, _test_results.passed);
         free(_test_registry.tests);
         return 0;
     } else {
         printf("\033[1;31m[FAIL]:\033[0m %d/%d tests failed\n", test_failures, _test_registry.count);
-        if (_test_results.verbose) {
-            printf("         %d assertions passed, %d failed\n",
-                   _test_results.passed, _test_results.failed);
-        }
+        printf("         %d assertions passed, %d failed\n",
+               _test_results.passed, _test_results.failed);
         free(_test_registry.tests);
         return 1;
     }
