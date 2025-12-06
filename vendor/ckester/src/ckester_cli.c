@@ -1,11 +1,12 @@
 /*
- * Ckastal Test Runner CLI
+ * Ckester - C Kit Test Runner CLI
  * Consolidates test execution, compilation, and management into a single binary.
  */
 
 #ifndef __CKASTAL_TEST_RUNNER_CLI_C__
 #define __CKASTAL_TEST_RUNNER_CLI_C__
 
+#include <ctype.h>
 #include <dirent.h>
 #include <errno.h>
 #include <glob.h>
@@ -27,17 +28,22 @@
 
 /* Configuration constants. */
 #define TEST_DIR "./test/suite"
-#define DEFAULT_BUILD_DIR "./build/ckastal_test"
+#define DEFAULT_BUILD_DIR "./build/ckester"
 #define MAX_PATH 512
 #define MAX_COMMAND 2048
 
-/* Test suite types in priority order for search. */
-static const char* TEST_SUITE_TYPES[] = {
+/* Test suite levels in priority order for search. */
+static const char* TEST_SUITE_LEVELS[] = {
+    "UNIT",
+    "INTEGRATION",
+    "SYSTEM",
+    NULL};
+
+static const char* TEST_SUITE_LEVELS_LOWER[] = {
     "unit",
     "integration",
-    "e2e",
-    NULL
-};
+    "system",
+    NULL};
 
 /* Execution modes. */
 typedef enum {
@@ -53,7 +59,7 @@ typedef struct {
     char cppflags[256];
     char build_dir[MAX_PATH];
     const char* test_name;
-    const char* suite_type;
+    const char* test_level;
 } RunnerConfig;
 
 /* Utility function to check if a file exists. */
@@ -116,7 +122,7 @@ static int _compile_test(const char* src_path, const char* bin_path, RunnerConfi
 /* Execute a single test binary. */
 static int _execute_test(const char* bin_path, const char* src_path, RunnerConfig* cfg) {
     char command[MAX_COMMAND];
-    char output[4096];
+    char output[32768];
     FILE* fp;
     int passed = 1;
 
@@ -145,7 +151,7 @@ static int _execute_test(const char* bin_path, const char* src_path, RunnerConfi
 
     /* Capture and display output. */
     output[0] = '\0';
-    char line[256];
+    char line[512];
     while (fgets(line, sizeof(line), fp)) {
         strcat(output, line);
         if (cfg->mode != MODE_SILENT) {
@@ -167,14 +173,14 @@ static int _execute_test(const char* bin_path, const char* src_path, RunnerConfi
     return passed ? 0 : -1;
 }
 
-/* Run all tests in a specific suite type. */
-static int _run_suite_tests(const char* suite_type, RunnerConfig* cfg, int* total, int* passed, int* failed) {
+/* Run all tests in a specific suite level. */
+static int _run_level_tests(const char* test_level, RunnerConfig* cfg, int* total, int* passed, int* failed) {
     glob_t globbuf;
     char pattern[MAX_PATH];
     char build_suite_dir[MAX_PATH];
 
-    snprintf(pattern, sizeof(pattern), "%s/%s/*.c", TEST_DIR, suite_type);
-    snprintf(build_suite_dir, sizeof(build_suite_dir), "%s/%s", cfg->build_dir, suite_type);
+    snprintf(pattern, sizeof(pattern), "%s/%s/*.c", TEST_DIR, test_level);
+    snprintf(build_suite_dir, sizeof(build_suite_dir), "%s/%s", cfg->build_dir, test_level);
 
     /* Check if suite directory exists. */
     if (glob(pattern, 0, NULL, &globbuf) != 0) {
@@ -188,10 +194,6 @@ static int _run_suite_tests(const char* suite_type, RunnerConfig* cfg, int* tota
 
     /* Ensure build directory exists for this suite. */
     _mkdir_recursive(build_suite_dir);
-
-    if (cfg->mode != MODE_SILENT) {
-        printf(COLOR_BLUE "\n[SUITE: %s]" COLOR_RESET "\n", suite_type);
-    }
 
     /* Compile and run each test. */
     for (size_t i = 0; i < globbuf.gl_pathc; i++) {
@@ -231,14 +233,17 @@ static int _run_suite_tests(const char* suite_type, RunnerConfig* cfg, int* tota
     return globbuf.gl_pathc;
 }
 
-/* Run tests for specific suite type or all. */
+/* Run tests for specific suite level or all. */
 static int _run_tests(RunnerConfig* cfg) {
     int total = 0;
     int passed = 0;
     int failed = 0;
 
     printf("\n" COLOR_BLUE "========================================\n");
-    printf("   Ckastal Test Runner — Mode: ");
+    printf("   Ckester - C Kit Test Runner\n");
+    printf("========================================" COLOR_RESET "\n\n");
+
+    printf(COLOR_MAGENTA "[MODE]: ");
     switch (cfg->mode) {
         case MODE_VERBOSE:
             printf("VERBOSE");
@@ -250,37 +255,63 @@ static int _run_tests(RunnerConfig* cfg) {
             printf("DEFAULT");
             break;
     }
-    printf("\n========================================" COLOR_RESET "\n\n");
+    printf(COLOR_RESET "\n");
+
+    if (strcmp(cfg->test_level, "all") == 0) {
+        printf(COLOR_BLUE "[LEVEL]: ");
+
+        size_t i = 0;
+
+        while (TEST_SUITE_LEVELS[i] != NULL) {
+            printf("%s", TEST_SUITE_LEVELS[i]);
+
+            if (TEST_SUITE_LEVELS[i + 1] != NULL) {
+                printf(", ");
+            }
+
+            i++;
+        }
+
+        printf(COLOR_RESET "\n");
+    } else {
+        printf(COLOR_BLUE "[LEVEL]: ");
+        for (int i = 0; i < strlen(cfg->test_level); i++) {
+            printf("%c", toupper(cfg->test_level[i]));
+        }
+        printf(COLOR_RESET "\n");
+    }
+
+    printf("\n");
 
     /* Ensure build directory exists. */
     _mkdir_recursive(cfg->build_dir);
 
-    /* Run tests for specific suite type or all. */
-    if (cfg->suite_type) {
-        /* Run specific suite type. */
+    /* Run tests for specific suite level or all. */
+    if (strcasecmp(cfg->test_level, "all") != 0) {
+        /* Run specific suite level. */
         int found = 0;
-        for (int i = 0; TEST_SUITE_TYPES[i] != NULL; i++) {
-            if (strcmp(TEST_SUITE_TYPES[i], cfg->suite_type) == 0) {
+        for (int i = 0; TEST_SUITE_LEVELS[i] != NULL; i++) {
+            if (strcasecmp(TEST_SUITE_LEVELS[i], cfg->test_level) == 0) {
                 found = 1;
                 break;
             }
         }
-        
+
         if (!found) {
-            fprintf(stderr, COLOR_RED "[ERROR]" COLOR_RESET " Unknown suite type: %s\n", cfg->suite_type);
-            fprintf(stderr, "Available types: ");
-            for (int i = 0; TEST_SUITE_TYPES[i] != NULL; i++) {
-                fprintf(stderr, "%s%s", i > 0 ? ", " : "", TEST_SUITE_TYPES[i]);
+            fprintf(stderr, COLOR_RED "[ERROR]" COLOR_RESET " Unknown test level: %s\n", cfg->test_level);
+            fprintf(stderr, "Available levels: ");
+            for (int i = 0; TEST_SUITE_LEVELS[i] != NULL; i++) {
+                fprintf(stderr, "%s%s", i > 0 ? ", " : "", TEST_SUITE_LEVELS[i]);
             }
             fprintf(stderr, "\n");
             return -1;
         }
-        
-        _run_suite_tests(cfg->suite_type, cfg, &total, &passed, &failed);
+
+        _run_level_tests(cfg->test_level, cfg, &total, &passed, &failed);
     } else {
-        /* Run all suite types. */
-        for (int i = 0; TEST_SUITE_TYPES[i] != NULL; i++) {
-            _run_suite_tests(TEST_SUITE_TYPES[i], cfg, &total, &passed, &failed);
+        /* Run all test levels. */
+        for (int i = 0; TEST_SUITE_LEVELS_LOWER[i] != NULL; i++) {
+            _run_level_tests(TEST_SUITE_LEVELS_LOWER[i], cfg, &total, &passed, &failed);
         }
     }
 
@@ -292,20 +323,20 @@ static int _run_tests(RunnerConfig* cfg) {
     /* Print summary. */
     printf("\n");
     if (failed == 0) {
-        printf(COLOR_GREEN "  ✓ Passed %d/%d test suites" COLOR_RESET "\n", passed, total);
+        printf(COLOR_GREEN "  ✓ %d passed, %d total" COLOR_RESET "\n", passed, total);
         return 0;
     } else {
-        printf(COLOR_RED "  ✗ Failed %d/%d test suites" COLOR_RESET "\n", failed, total);
+        printf(COLOR_RED "  ✗ %d failed, %d total" COLOR_RESET "\n", failed, total);
         return 1;
     }
 }
 
 /* Find test file by searching through suite types in priority order. */
-static int _find_test_file(const char* test_name, char* src_path, char* suite_type) {
-    for (int i = 0; TEST_SUITE_TYPES[i] != NULL; i++) {
-        snprintf(src_path, MAX_PATH, "%s/%s/%s.c", TEST_DIR, TEST_SUITE_TYPES[i], test_name);
+static int _find_test_file(const char* test_name, char* src_path, char* test_level) {
+    for (int i = 0; TEST_SUITE_LEVELS[i] != NULL; i++) {
+        snprintf(src_path, MAX_PATH, "%s/%s/%s.c", TEST_DIR, TEST_SUITE_LEVELS[i], test_name);
         if (_file_exists(src_path)) {
-            strcpy(suite_type, TEST_SUITE_TYPES[i]);
+            strcpy(test_level, TEST_SUITE_LEVELS[i]);
             return 0;
         }
     }
@@ -316,28 +347,28 @@ static int _find_test_file(const char* test_name, char* src_path, char* suite_ty
 static int _run_single_test(RunnerConfig* cfg) {
     if (!cfg->test_name) {
         fprintf(stderr, COLOR_RED "[ERROR]" COLOR_RESET " Please specify test name\n");
-        fprintf(stderr, "Usage: ckastal-test single <test_name>\n");
+        fprintf(stderr, "Usage: ckester single <test_name>\n");
         return -1;
     }
 
     char src_path[MAX_PATH];
-    char suite_type[64];
+    char test_level[64];
     char bin_path[MAX_PATH];
     char build_suite_dir[MAX_PATH];
 
     /* Find test file across suite types. */
-    if (_find_test_file(cfg->test_name, src_path, suite_type) != 0) {
+    if (_find_test_file(cfg->test_name, src_path, test_level) != 0) {
         fprintf(stderr, COLOR_RED "[ERROR]" COLOR_RESET " Test file '%s.c' not found in any suite\n", cfg->test_name);
         fprintf(stderr, "Searched in: ");
-        for (int i = 0; TEST_SUITE_TYPES[i] != NULL; i++) {
-            fprintf(stderr, "%s%s", i > 0 ? ", " : "", TEST_SUITE_TYPES[i]);
+        for (int i = 0; TEST_SUITE_LEVELS[i] != NULL; i++) {
+            fprintf(stderr, "%s%s", i > 0 ? ", " : "", TEST_SUITE_LEVELS[i]);
         }
         fprintf(stderr, "\n");
         return -1;
     }
 
     /* Build paths. */
-    snprintf(build_suite_dir, sizeof(build_suite_dir), "%s/%s", cfg->build_dir, suite_type);
+    snprintf(build_suite_dir, sizeof(build_suite_dir), "%s/%s", cfg->build_dir, test_level);
     snprintf(bin_path, sizeof(bin_path), "%s/%s", build_suite_dir, cfg->test_name);
 
     /* Ensure build directory exists. */
@@ -351,7 +382,10 @@ static int _run_single_test(RunnerConfig* cfg) {
     }
 
     printf("\n" COLOR_BLUE "========================================\n");
-    printf("   Ckastal Test Runner — Mode: ");
+    printf("   Ckester - C Kit Test Runner\n");
+    printf("========================================" COLOR_RESET "\n\n");
+
+    printf("[MODE]: ");
     switch (cfg->mode) {
         case MODE_VERBOSE:
             printf("VERBOSE");
@@ -363,11 +397,7 @@ static int _run_single_test(RunnerConfig* cfg) {
             printf("DEFAULT");
             break;
     }
-    printf("\n========================================" COLOR_RESET "\n\n");
-
-    if (cfg->mode != MODE_SILENT) {
-        printf(COLOR_BLUE "[SUITE: %s]" COLOR_RESET "\n", suite_type);
-    }
+    printf("\n");
 
     /* Execute test. */
     int result = _execute_test(bin_path, src_path, cfg);
@@ -399,11 +429,11 @@ static int _clean_build(RunnerConfig* cfg) {
 
 /* Display help information. */
 static void _print_help(void) {
-    printf("\n" COLOR_BLUE "Ckastal Test Runner" COLOR_RESET "\n\n");
-    printf("Usage: ckastal-test <command> [options]\n\n");
+    printf("\n" COLOR_BLUE "Ckester - C Kit Test Runner" COLOR_RESET "\n\n");
+    printf("Usage: ckester <command> [options]\n\n");
     printf(COLOR_BLUE "Commands:" COLOR_RESET "\n");
-    printf("  " COLOR_GREEN "all" COLOR_RESET "              Run all tests across all suites (unit, integration, e2e)\n");
-    printf("  " COLOR_GREEN "single" COLOR_RESET " <name>    Run a single test (searches unit, integration, e2e in order)\n");
+    printf("  " COLOR_GREEN "all" COLOR_RESET "              Run all tests across all suites (unit, integration, system)\n");
+    printf("  " COLOR_GREEN "single" COLOR_RESET " <name>    Run a single test (searches unit, integration, system in order)\n");
     printf("  " COLOR_GREEN "clean" COLOR_RESET "            Clean build artifacts\n");
     printf("  " COLOR_GREEN "help" COLOR_RESET "             Show this help message\n\n");
     printf(COLOR_BLUE "Options:" COLOR_RESET "\n");
@@ -412,12 +442,12 @@ static void _print_help(void) {
     printf("  " COLOR_YELLOW "-d, --default" COLOR_RESET "   Use default mode (default)\n");
     printf("  " COLOR_YELLOW "-b, --build-dir" COLOR_RESET " <path>  Set build directory (default: ./build/ckastal_test)\n\n");
     printf(COLOR_BLUE "Examples:" COLOR_RESET "\n");
-    printf("  ckastal-test all\n");
-    printf("  ckastal-test all --verbose\n");
-    printf("  ckastal-test all --build-dir ./custom_build\n");
-    printf("  ckastal-test single array_test\n");
-    printf("  ckastal-test single lenstr_test --verbose\n");
-    printf("  ckastal-test clean\n\n");
+    printf("  ckester all\n");
+    printf("  ckester all --verbose\n");
+    printf("  ckester all --build-dir ./custom_build\n");
+    printf("  ckester single array_test\n");
+    printf("  ckester single lenstr_test --verbose\n");
+    printf("  ckester clean\n\n");
 }
 
 /* Main entry point. */
@@ -428,7 +458,9 @@ int main(int argc, char* argv[]) {
         .cppflags = "",
         .build_dir = DEFAULT_BUILD_DIR,
         .test_name = NULL,
-        .suite_type = NULL};
+        .test_level = TEST_SUITE_LEVELS_LOWER[0],
+
+    };
 
     /* Load CFLAGS and CPPFLAGS from environment. */
     const char* env_cflags = getenv("CFLAGS");
@@ -469,15 +501,16 @@ int main(int argc, char* argv[]) {
 
     /* Execute command. */
     if (strcmp(command, "all") == 0) {
+        cfg.test_level = "all";
         return _run_tests(&cfg);
     } else if (strcmp(command, "unit") == 0) {
-        cfg.suite_type = "unit";
+        cfg.test_level = "unit";
         return _run_tests(&cfg);
     } else if (strcmp(command, "integration") == 0) {
-        cfg.suite_type = "integration";
+        cfg.test_level = "integration";
         return _run_tests(&cfg);
-    } else if (strcmp(command, "e2e") == 0) {
-        cfg.suite_type = "e2e";
+    } else if (strcmp(command, "system") == 0) {
+        cfg.test_level = "system";
         return _run_tests(&cfg);
     } else if (strcmp(command, "single") == 0) {
         return _run_single_test(&cfg);

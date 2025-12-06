@@ -1,7 +1,7 @@
 #include <stdlib.h>
 
 #include "../../../include/linked_list.c"
-#include "../../ckastal_test_runner.c"
+#include "../../../vendor/ckester/include/index.c"
 
 TEST(list_push_and_unshift_100_elements) {
     Ck_List list = ck_list_init(NULL, CK_LIST_LINEAR);
