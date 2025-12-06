@@ -5,9 +5,9 @@
 #include <stdlib.h>
 
 /** */
-#include "../../../core/init.c"
-#include "../../../core/os.c"
-#include "../../string/null_terminated/index.c"
+#include "../../core/init.c"
+#include "../../core/os.c"
+#include "../string/null_terminated/index.c"
 
 #ifdef CKASTAL_CORE_OS_WINDOWS
 #include "../../vendor/gnu-win-regex-2.7-src/src/regex.c"

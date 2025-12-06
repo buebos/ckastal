@@ -9,8 +9,8 @@ typedef char* (*Ck_DataTypeToStr)(void*);
 
 typedef enum Ck_DataTypeCompareResult {
     CK_LT = 0,
-    CK_EQ = 0,
-    CK_GT = 0,
+    CK_EQ = 1,
+    CK_GT = 2,
 } Ck_DataTypeCompareResult;
 
 typedef Ck_DataTypeCompareResult (*Ck_DataTypeCompare)(void*, void*);
