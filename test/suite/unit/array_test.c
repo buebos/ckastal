@@ -1,48 +1,68 @@
-#include <assert.h>
-#include <stdbool.h>
-#include <stddef.h>
-#include <stdio.h>
-
 #include "../../../include/array.c"
-#include "../../../vendor/clogg/src/clogg.c"
+
+#include "../../ckastal_test_runner.c"
 
 CK_ARRAY_DECLARE_BUBBLE_SORT_FN(int, int_bubble_sort, {
     should_swap = *a > *b;
 });
 
-void print_array(int* array, size_t len) {
-    for (size_t i = 0; i < len; i++) {
-        printf("%d ", array[i]);
+TEST(bubble_sort_random_array) {
+    int arr[] = {5, 2, 9, 1, 5, 6};
+    size_t len = sizeof(arr) / sizeof(arr[0]);
+    int_bubble_sort(arr, len);
+
+    for (size_t i = 1; i < len; i++) {
+        ASSERT_TRUE(arr[i - 1] <= arr[i]);
     }
-    printf("\n");
 }
 
-int main() {
-    int arr1[] = {5, 2, 9, 1, 5, 6};
-    size_t len1 = sizeof(arr1) / sizeof(arr1[0]);
-    int_bubble_sort(arr1, len1);
+TEST(bubble_sort_already_sorted) {
+    int arr[] = {1, 2, 3, 4, 5, 6};
+    size_t len = sizeof(arr) / sizeof(arr[0]);
+    int_bubble_sort(arr, len);
 
-    for (size_t i = 1; i < len1; i++) {
-        assert(arr1[i - 1] <= arr1[i]);
+    for (size_t i = 1; i < len; i++) {
+        ASSERT_TRUE(arr[i - 1] <= arr[i]);
+    }
+}
+
+TEST(bubble_sort_with_duplicates) {
+    int arr[] = {5, 2, 9, 2, 5, 6};
+    size_t len = sizeof(arr) / sizeof(arr[0]);
+    int_bubble_sort(arr, len);
+
+    for (size_t i = 1; i < len; i++) {
+        ASSERT_TRUE(arr[i - 1] <= arr[i]);
+    }
+}
+
+TEST(bubble_sort_empty_array) {
+    int arr[] = {};
+    size_t len = sizeof(arr) / sizeof(arr[0]);
+    int_bubble_sort(arr, len);
+
+    /* Empty array should not crash. */
+    ASSERT_EQ(len, 0);
+}
+
+TEST(bubble_sort_single_element) {
+    int arr[] = {42};
+    size_t len = sizeof(arr) / sizeof(arr[0]);
+    int_bubble_sort(arr, len);
+
+    ASSERT_EQ(arr[0], 42);
+    ASSERT_EQ(len, 1);
+}
+
+TEST(bubble_sort_reverse_sorted) {
+    int arr[] = {6, 5, 4, 3, 2, 1};
+    size_t len = sizeof(arr) / sizeof(arr[0]);
+    int_bubble_sort(arr, len);
+
+    for (size_t i = 1; i < len; i++) {
+        ASSERT_TRUE(arr[i - 1] <= arr[i]);
     }
 
-    int arr2[] = {1, 2, 3, 4, 5, 6};
-    size_t len2 = sizeof(arr2) / sizeof(arr2[0]);
-    int_bubble_sort(arr2, len2);
-    for (size_t i = 1; i < len2; i++) {
-        assert(arr2[i - 1] <= arr2[i]);
-    }
-
-    int arr3[] = {5, 2, 9, 2, 5, 6};
-    size_t len3 = sizeof(arr3) / sizeof(arr3[0]);
-    int_bubble_sort(arr3, len3);
-    for (size_t i = 1; i < len3; i++) assert(arr3[i - 1] <= arr3[i]);
-
-    int arr4[] = {};
-    size_t len4 = sizeof(arr4) / sizeof(arr4[0]);
-    int_bubble_sort(arr4, len4);
-
-    cloggln(CLOGG_INFO, "All tests passed");
-
-    return 0;
+    ASSERT_EQ(arr[0], 1);
+    ASSERT_EQ(arr[len - 1], 6);
 }
