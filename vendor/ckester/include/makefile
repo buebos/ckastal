@@ -1,13 +1,11 @@
 # Makefile wrapper for ckester test runner
-
-.PHONY: test test-all test-single test-clean help
+.PHONY: test test-all test-single test-clean help test-unit test-integration test-system
 
 CKESTER_INCLUDE_MAKEFILE_DIR := $(dir $(lastword $(MAKEFILE_LIST)))
-CKESTER_BIN := $(CKESTER_INCLUDE_MAKEFILE_DIR)../build/ckester
 
 include $(CKESTER_INCLUDE_MAKEFILE_DIR)../makefile
 
-# Build directory (can be overridden: make test CKESTER_BUILD_DIR=./custom_build)
+CKESTER_BIN := $(CKESTER_INCLUDE_MAKEFILE_DIR)../build/ckester
 CKESTER_BUILD_DIR := $(CKESTER_INCLUDE_MAKEFILE_DIR)../build
 
 # CKESTER_MODE normalization
@@ -27,7 +25,7 @@ ifeq ($(CKESTER_MODE),S)
   CKESTER_MODE_FLAG = --silent
 endif
 
-# Default test target - runs all tests
+# Runs only unit tests by default to avoid overload or expensive tests
 test: ckester
 	@$(CKESTER_BIN) unit $(CKESTER_MODE_FLAG)
 

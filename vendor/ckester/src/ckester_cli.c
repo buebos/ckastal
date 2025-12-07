@@ -77,6 +77,62 @@ static int _file_is_newer(const char* file_a, const char* file_b) {
     return st_a.st_mtime > st_b.st_mtime;
 }
 
+/* Recursively check if any files in a directory are newer than the binary. */
+static int _dir_has_newer_files(const char* dir, const char* bin_path, const char* ext) {
+    char pattern[MAX_PATH];
+    glob_t globbuf;
+    int is_newer = 0;
+    
+    /* Build pattern: 'dir / *ext' and 'dir / * / *ext' for two levels. */
+    snprintf(pattern, sizeof(pattern), "%s/*%s", dir, ext);
+    if (glob(pattern, 0, NULL, &globbuf) == 0) {
+        for (size_t i = 0; i < globbuf.gl_pathc; i++) {
+            if (_file_is_newer(globbuf.gl_pathv[i], bin_path)) {
+                is_newer = 1;
+                globfree(&globbuf);
+                return 1;
+            }
+        }
+        globfree(&globbuf);
+    }
+    
+    /* Check subdirectories. */
+    snprintf(pattern, sizeof(pattern), "%s/*/*%s", dir, ext);
+    if (glob(pattern, 0, NULL, &globbuf) == 0) {
+        for (size_t i = 0; i < globbuf.gl_pathc; i++) {
+            if (_file_is_newer(globbuf.gl_pathv[i], bin_path)) {
+                is_newer = 1;
+                globfree(&globbuf);
+                return 1;
+            }
+        }
+        globfree(&globbuf);
+    }
+    
+    /* Check deeper subdirectories. */
+    snprintf(pattern, sizeof(pattern), "%s/*/*/*%s", dir, ext);
+    if (glob(pattern, 0, NULL, &globbuf) == 0) {
+        for (size_t i = 0; i < globbuf.gl_pathc; i++) {
+            if (_file_is_newer(globbuf.gl_pathv[i], bin_path)) {
+                is_newer = 1;
+                globfree(&globbuf);
+                return 1;
+            }
+        }
+        globfree(&globbuf);
+    }
+    
+    return is_newer;
+}
+
+/* Check if any dependencies are newer than the binary. */
+static int _dependencies_are_newer(const char* bin_path) {
+    if (_dir_has_newer_files("src", bin_path, ".c")) return 1;
+    if (_dir_has_newer_files("include", bin_path, ".c")) return 1;
+    if (_dir_has_newer_files("include", bin_path, ".h")) return 1;
+    return 0;
+}
+
 /* Create directory recursively. */
 static int _mkdir_recursive(const char* path) {
     char tmp[MAX_PATH];
@@ -212,7 +268,9 @@ static int _run_level_tests(const char* test_level, RunnerConfig* cfg, int* tota
         snprintf(bin_path, sizeof(bin_path), "%s/%s", build_suite_dir, test_name);
 
         /* Compile if needed. */
-        if (!_file_exists(bin_path) || _file_is_newer(src_path, bin_path)) {
+if (!_file_exists(bin_path) || 
+    _file_is_newer(src_path, bin_path) || 
+    _dependencies_are_newer(bin_path)) {
             if (_compile_test(src_path, bin_path, cfg) != 0) {
                 (*failed)++;
                 continue;
@@ -373,7 +431,9 @@ static int _run_single_test(RunnerConfig* cfg) {
     _mkdir_recursive(build_suite_dir);
 
     /* Compile if needed. */
-    if (!_file_exists(bin_path) || _file_is_newer(src_path, bin_path)) {
+if (!_file_exists(bin_path) || 
+    _file_is_newer(src_path, bin_path) || 
+    _dependencies_are_newer(bin_path)) {
         if (_compile_test(src_path, bin_path, cfg) != 0) {
             return -1;
         }
