@@ -1,6 +1,6 @@
 #include "../../../include/array.c"
 
-#include "../../ckastal_test_runner.c"
+#include "../../../vendor/ckester/include/index.c"
 
 CK_ARRAY_DECLARE_BUBBLE_SORT_FN(int, int_bubble_sort, {
     should_swap = *a > *b;

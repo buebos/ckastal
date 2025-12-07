@@ -15,10 +15,13 @@ typedef enum Ck_DataTypeCompareResult {
 
 typedef Ck_DataTypeCompareResult (*Ck_DataTypeCompare)(void*, void*);
 
+typedef void (*Ck_DataTypeFree)(void*);
+
 typedef struct Ck_DataType {
     size_t size;
     Ck_DataTypeToStr to_str;
     Ck_DataTypeCompare compare;
+    Ck_DataTypeFree free;
 } Ck_DataType;
 
 #endif /* __CKASTAL_CORE_DATA_C__ */

@@ -10,7 +10,7 @@ Ck_DataType integer = {
 };
 
 int main(void) {
-    Ck_List list = ck_list_init(&integer, CK_LIST_LINEAR);
+    Ck_List list = ck_list_init(&integer, CK_LIST_MODE_LINEAR);
     Ck_Iterator iterator = ck_list_iterator(&list);
 
     int integers[10] = {1, 2, 3, 4, 5, 6, 7, 8, 9, 10};

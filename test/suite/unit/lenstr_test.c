@@ -2,7 +2,7 @@
 #include <string.h>
 
 #include "../../../include/prefixed_length_string.c"
-#include "../../ckastal_test_runner.c"
+#include "../../../vendor/ckester/include/index.c"
 
 TEST(lenstr_basic_equality) {
     Ck_LenStr hello = ck_lenstr_init(ck_lenstr_slp("hello"));

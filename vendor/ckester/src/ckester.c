@@ -81,11 +81,10 @@ static void _ckastal_register_test(void (*test)(void), const char* name) {
 /* MSVC uses different approach */
 #define _CKASTAL_CONSTRUCTOR
 #pragma section(".CRT$XCU", read)
-#define _CKASTAL_MSVC_INIT(f, p) \
-    static void f(void); \
+#define _CKASTAL_MSVC_INIT(f, p)                             \
+    static void f(void);                                     \
     __declspec(allocate(".CRT$XCU")) void (*f##_)(void) = f; \
-    __pragma(comment(linker,"/include:" p #f "_")) \
-    static void f(void)
+    __pragma(comment(linker, "/include:" p #f "_")) static void f(void)
 #else
 #define _CKASTAL_CONSTRUCTOR
 #warning "Auto-registration not supported on this compiler. Please register tests manually."
@@ -93,28 +92,28 @@ static void _ckastal_register_test(void (*test)(void), const char* name) {
 
 /* Test definition macro with auto-registration. */
 #ifdef _MSC_VER
-#define TEST(test_name)                                                          \
-    static void test_##test_name(void);                                          \
-    static void _run_##test_name(void) {                                         \
-        _test_results.current_test = #test_name;                                 \
-        _test_results.current_assertions = 0;                                    \
-        test_##test_name();                                                      \
-    }                                                                            \
-    _CKASTAL_MSVC_INIT(_init_##test_name, "") {                                  \
-        _ckastal_register_test(_run_##test_name, #test_name);                    \
-    }                                                                            \
+#define TEST(test_name)                                       \
+    static void test_##test_name(void);                       \
+    static void _run_##test_name(void) {                      \
+        _test_results.current_test = #test_name;              \
+        _test_results.current_assertions = 0;                 \
+        test_##test_name();                                   \
+    }                                                         \
+    _CKASTAL_MSVC_INIT(_init_##test_name, "") {               \
+        _ckastal_register_test(_run_##test_name, #test_name); \
+    }                                                         \
     static void test_##test_name(void)
 #else
-#define TEST(test_name)                                                          \
-    static void test_##test_name(void);                                          \
-    static void _run_##test_name(void) {                                         \
-        _test_results.current_test = #test_name;                                 \
-        _test_results.current_assertions = 0;                                    \
-        test_##test_name();                                                      \
-    }                                                                            \
-    _CKASTAL_CONSTRUCTOR static void _init_##test_name(void) {                   \
-        _ckastal_register_test(_run_##test_name, #test_name);                    \
-    }                                                                            \
+#define TEST(test_name)                                        \
+    static void test_##test_name(void);                        \
+    static void _run_##test_name(void) {                       \
+        _test_results.current_test = #test_name;               \
+        _test_results.current_assertions = 0;                  \
+        test_##test_name();                                    \
+    }                                                          \
+    _CKASTAL_CONSTRUCTOR static void _init_##test_name(void) { \
+        _ckastal_register_test(_run_##test_name, #test_name);  \
+    }                                                          \
     static void test_##test_name(void)
 #endif
 
@@ -155,17 +154,13 @@ static int _ckastal_run_all_tests(void) {
 
     if (test_failures == 0) {
         printf("[INFO]:  All tests passed\n");
-        if (_test_results.verbose) {
-            printf("         %d tests, %d assertions\n", _test_registry.count, _test_results.passed);
-        }
+        printf("         %d tests, %d assertions\n", _test_registry.count, _test_results.passed);
         free(_test_registry.tests);
         return 0;
     } else {
         printf("\033[1;31m[FAIL]:\033[0m %d/%d tests failed\n", test_failures, _test_registry.count);
-        if (_test_results.verbose) {
-            printf("         %d assertions passed, %d failed\n",
-                   _test_results.passed, _test_results.failed);
-        }
+        printf("         %d assertions passed, %d failed\n",
+               _test_results.passed, _test_results.failed);
         free(_test_registry.tests);
         return 1;
     }
