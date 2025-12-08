@@ -3,8 +3,8 @@
  * Consolidates test execution, compilation, and management into a single binary.
  */
 
-#ifndef __CKASTAL_TEST_RUNNER_CLI_C__
-#define __CKASTAL_TEST_RUNNER_CLI_C__
+#ifndef __CKESTER_TEST_RUNNER_CLI_C__
+#define __CKESTER_TEST_RUNNER_CLI_C__
 
 #include <ctype.h>
 #include <dirent.h>
@@ -498,7 +498,7 @@ static void _print_help(void) {
     printf("  " COLOR_YELLOW "-v, --verbose" COLOR_RESET "   Enable verbose output\n");
     printf("  " COLOR_YELLOW "-s, --silent" COLOR_RESET "    Enable silent mode\n");
     printf("  " COLOR_YELLOW "-d, --default" COLOR_RESET "   Use default mode (default)\n");
-    printf("  " COLOR_YELLOW "-b, --build-dir" COLOR_RESET " <path>  Set build directory (default: ./build/ckastal_test)\n\n");
+    printf("  " COLOR_YELLOW "-b, --build-dir" COLOR_RESET " <path>  Set build directory (default: ./build/ckester_test)\n\n");
     printf(COLOR_BLUE "Examples:" COLOR_RESET "\n");
     printf("  ckester all\n");
     printf("  ckester all --verbose\n");
